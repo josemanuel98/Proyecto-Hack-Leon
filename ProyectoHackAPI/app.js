@@ -7,11 +7,25 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var mysql = require('mysql');
+var connection = require("express-myconnection");
+
 var app = express();
 
+//Create Sql Connection
+app.use(connection(mysql, {
+  host: "localhost", 
+  user: "root", 
+  password: "root", 
+  database: "CuentasProBD", 
+  port: 8889
+}, 'request'));
+
+
 // view engine setup
+app.engine('html', require('ejs').renderFile);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'html');
 
 app.use(logger('dev'));
 app.use(express.json());
