@@ -146,6 +146,7 @@ BEGIN
 END;
 $$
 
+###### 2 
 DELIMITER $$
 CREATE PROCEDURE uspLogInServidoPublico
 (
@@ -163,7 +164,7 @@ BEGIN
     SELECT @idServidorPublico;
 END;
 $$
-
+##### 3
 DELIMITER $$
 CREATE PROCEDURE uspAddCiudadano
 (
@@ -201,6 +202,7 @@ BEGIN
 END;
 $$
 
+#### 4.
 DELIMITER $$
 CREATE PROCEDURE uspAddServidorPublico
 (
@@ -238,6 +240,7 @@ BEGIN
 END;
 $$
 
+####### 5.
 DELIMITER $$
 CREATE PROCEDURE uspAddReporte
 (
@@ -288,6 +291,9 @@ BEGIN
 END;
 $$
 
+
+
+####### 6.
 DELIMITER $$
 CREATE PROCEDURE uspGiveApoyo
 (
@@ -325,6 +331,7 @@ BEGIN
 END;
 $$
 
+####### 7
 DELIMITER $$
 CREATE PROCEDURE uspRemoveApoyo
 (
@@ -359,6 +366,7 @@ BEGIN
 END;
 $$
 
+######## 8
 DELIMITER $$
 CREATE PROCEDURE uspAddReporteSOS_Video
 (
@@ -399,6 +407,7 @@ BEGIN
 END;
 $$
 
+###### 9
 DELIMITER $$
 CREATE PROCEDURE uspAddReporteSOS_Imagen
 (
@@ -439,6 +448,8 @@ BEGIN
 END;
 $$
 
+
+####### 10
 DELIMITER $$
 CREATE PROCEDURE uspAddReporteSOS_Audio
 (
@@ -479,6 +490,7 @@ BEGIN
 END;
 $$
 
+###### 11
 DELIMITER $$
 CREATE PROCEDURE uspFinishReporteSOS
 (
@@ -512,6 +524,7 @@ BEGIN
 END;
 $$
 
+########## 12
 DELIMITER $$
 CREATE PROCEDURE uspAddHorarioZona
 (
@@ -550,6 +563,7 @@ BEGIN
 END;
 $$
 
+###### 13
 DELIMITER $$
 CREATE PROCEDURE uspAddDetalle_Zona_Horario
 (
@@ -591,6 +605,8 @@ BEGIN
 END;
 $$
 
+
+##### 14
 DELIMITER $$
 CREATE PROCEDURE uspUpdateDetalle_Zona_Horario
 (
@@ -624,6 +640,7 @@ BEGIN
 END;
 $$
 
+##### 15
 DELIMITER $$
 CREATE PROCEDURE uspAddDetalle_Ciudadano_Zona
 (
@@ -656,7 +673,7 @@ END;
 $$
 
 /****************Consultas*************************/
-
+#### 16
 DELIMITER $$
 CREATE PROCEDURE uspGetAllReporte()
 BEGIN
