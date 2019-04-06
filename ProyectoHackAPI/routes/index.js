@@ -266,7 +266,41 @@ router.post('/HackLeon/v1/AddHorarioZona', function(req, res, next) {
   }
 });
 
-/****************** 16. uspAddHorarioZona ******************/
+/****************** 16. uspGetAllReporte ******************/
+router.post('/HackLeon/v1/GetAllReporte', function(req, res, next) {
+  try{
+    var reqObj = req.body;
+    console.log(reqObj);
+    req.getConnection(function(err, conn){
+        if(err) {
+            console.error('SQL Connection error: ', err);
+            return next(err);
+        }else{
+            var id_servidor_p = req.body.IdServidorPublico_P;
+            var id_detalle_zona_p = req.body.IdDetalle_Zona_Horario_P;
+            var codigo_p = req.body.Codigo_P;
+
+            var auxQuery = `CALL uspGetAllReporte(${id_servidor_p}, 
+            ${id_detalle_zona_p}, '${codigo_p}')`;
+            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
+                if(err) {
+                    console.error('SQL error: ', err);
+                    return next(err);
+                }
+                var response = result[0];
+                res.json(response[0]);
+                console.log(result);
+            });
+        }
+    });
+} catch(ex) {
+    console.error("Internal error:" + ex);
+    return next(ex);
+  }
+});
+
+
+/****************** 18. u ******************/
 router.post('/HackLeon/v1/AddHorarioZona', function(req, res, next) {
   try{
     var reqObj = req.body;
@@ -298,7 +332,6 @@ router.post('/HackLeon/v1/AddHorarioZona', function(req, res, next) {
     return next(ex);
   }
 });
-
 
 
 module.exports = router;
