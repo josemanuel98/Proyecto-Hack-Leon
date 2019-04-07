@@ -104,6 +104,66 @@ router.post('/HackLeon/v1/AddReporte', function(req, res, next) {
   }
 });
 
+router.post('/HackLeon/v1/UpdateReporteState', function(req, res, next) {
+  try{
+    var reqObj = req.body;
+    console.log(reqObj);
+    req.getConnection(function(err, conn){
+        if(err) {
+            console.error('SQL Connection error: ', err);
+            return next(err);
+        }else{
+            var idReporte = req.body.IdReporte;
+            var estado = req.body.Estado;
+            var seguimiento = req.body.Seguimiento;
+            var auxQuery = `CALL uspUpdateReporteState(${idReporte}, ${estado}, '${seguimiento}')`;
+            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
+                if(err) {
+                    console.error('SQL error: ', err);
+                    return next(err);
+                }
+                var response = result[0];
+                res.json(response[0]);
+                console.log(result);
+            });
+        }
+    });
+} catch(ex) {
+    console.error("Internal error:" + ex);
+    return next(ex);
+  }
+});
+
+router.post('/HackLeon/v1/Link_Reporte_Funcionario', function(req, res, next) {
+  try{
+    var reqObj = req.body;
+    console.log(reqObj);
+    req.getConnection(function(err, conn){
+        if(err) {
+            console.error('SQL Connection error: ', err);
+            return next(err);
+        }else{
+            var idReporte = req.body.IdReporte;
+            var idServidorPublico = req.body.IdServidorPublico;
+            var idAnalistaC4 = req.body.IdAnalistaC4;
+            var auxQuery = `CALL uspLink_Reporte_Funcionario(${idReporte}, ${idServidorPublico}, ${idAnalistaC4})`;
+            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
+                if(err) {
+                    console.error('SQL error: ', err);
+                    return next(err);
+                }
+                var response = result[0];
+                res.json(response[0]);
+                console.log(result);
+            });
+        }
+    });
+} catch(ex) {
+    console.error("Internal error:" + ex);
+    return next(ex);
+  }
+});
+
 router.post('/HackLeon/v1/RemoveApoyo', function(req, res, next) {
   try{
     var reqObj = req.body;
@@ -164,6 +224,36 @@ router.post('/HackLeon/v1/AddReporteSOS_Imagen', function(req, res, next) {
   }
 });
 
+router.post('/HackLeon/v1/Link_ReporteSOS_Dependencia', function(req, res, next) {
+  try{
+    var reqObj = req.body;
+    console.log(reqObj);
+    req.getConnection(function(err, conn){
+        if(err) {
+            console.error('SQL Connection error: ', err);
+            return next(err);
+        }else{
+            var idReporteSOS = req.body.IdReporteSOS;
+            var idDependencia = req.body.IdDependencia;
+            var idAnalista911 = req.body.IdAnalista911;
+            var auxQuery = `CALL uspLink_ReporteSOS_Dependencia(${idReporteSOS}, ${idDependencia}, ${idAnalista911})`;
+            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
+                if(err) {
+                    console.error('SQL error: ', err);
+                    return next(err);
+                }
+                var response = result[0];
+                res.json(response[0]);
+                console.log(result);
+            });
+        }
+    });
+} catch(ex) {
+    console.error("Internal error:" + ex);
+    return next(ex);
+  }
+});
+
 router.post('/HackLeon/v1/FinishReporteSOS', function(req, res, next) {
   try{
     var reqObj = req.body;
@@ -194,66 +284,6 @@ router.post('/HackLeon/v1/FinishReporteSOS', function(req, res, next) {
 });
 
 /******************* Zonas ***********************/
-
-router.post('/HackLeon/v1/AddDetalle_Zona_Horario', function(req, res, next) {
-  try{
-    var reqObj = req.body;
-    console.log(reqObj);
-    req.getConnection(function(err, conn){
-        if(err) {
-            console.error('SQL Connection error: ', err);
-            return next(err);
-        }else{
-            var idServidorPublico = req.body.IdServidorPublico;
-            var idHorarioZona = req.body.IdHorarioZona;
-            var idZona = req.body.IdZona;
-            var codigo = req.body.Codigo;
-            var auxQuery = `CALL uspAddDetalle_Zona_Horario(${idServidorPublico}, ${idHorarioZona}, ${idZona}, '${codigo}')`;
-            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
-                if(err) {
-                    console.error('SQL error: ', err);
-                    return next(err);
-                }
-                var response = result[0];
-                res.json(response[0]);
-                console.log(result);
-            });
-        }
-    });
-} catch(ex) {
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-router.post('/HackLeon/v1/AddDetalle_Ciudadano_Zona', function(req, res, next) {
-  try{
-    var reqObj = req.body;
-    console.log(reqObj);
-    req.getConnection(function(err, conn){
-        if(err) {
-            console.error('SQL Connection error: ', err);
-            return next(err);
-        }else{
-            var idServidorPublico = req.body.IdServidorPublico;
-            var idZona = req.body.IdZona;
-            var auxQuery = `CALL uspAddDetalle_Ciudadano_Zona(${idServidorPublico}, ${idZona})`;
-            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
-                if(err) {
-                    console.error('SQL error: ', err);
-                    return next(err);
-                }
-                var response = result[0];
-                res.json(response[0]);
-                console.log(result);
-            });
-        }
-    });
-} catch(ex) {
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
 
 router.get('/HackLeon/v1/GetAllReporte', function(req, res, next) {
   try{
@@ -337,7 +367,6 @@ router.get('/HackLeon/v1/GetAllRol', function(req, res, next) {
 });
 
 
-
 /****************** 2. uspLogInServidoPublico ******************/
 router.post('/HackLeon/v1/LogInServidoPublico', function(req, res, next) {
   try{
@@ -415,7 +444,7 @@ router.post('/HackLeon/v1/GiveApoyo', function(req, res, next) {
             var id_ciudadano_p = req.body.IdCiudadano_P;
             var id_reporte_p = req.body.IdReporte_P;
 
-            var auxQuery = `CALL uspGiveApoyo(${id_rol_p}, ${id_rol_p})`;
+            var auxQuery = `CALL uspGiveApoyo(${id_ciudadano_p}, ${id_reporte_p})`;
             var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
                 if(err) {
                     console.error('SQL error: ', err);
@@ -485,138 +514,6 @@ router.post('/HackLeon/v1/AddReporteSOS_Audio', function(req, res, next) {
 
             var auxQuery = `CALL uspAddReporteSOS_Audio(${id_ciudadano_p}, ${id_categoria_rep_sos},
             '${ubicacion_p}', '${audio_p}')`;
-            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
-                if(err) {
-                    console.error('SQL error: ', err);
-                    return next(err);
-                }
-                var response = result[0];
-                res.json(response[0]);
-                console.log(result);
-            });
-        }
-    });
-} catch(ex) {
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-/****************** 12. uspAddHorarioZona ******************/
-router.post('/HackLeon/v1/AddHorarioZona', function(req, res, next) {
-  try{
-    var reqObj = req.body;
-    console.log(reqObj);
-    req.getConnection(function(err, conn){
-        if(err) {
-            console.error('SQL Connection error: ', err);
-            return next(err);
-        }else{
-            var id_servidor_p = req.body.IdServidorPublico_P;
-            var hora_inicial_p = req.body.HoraInicial_P;
-            var hora_final_p = req.body.HoraFinal_P;
-
-            var auxQuery = `CALL uspAddHorarioZona(${id_servidor_p}, ${hora_inicial_p}, ${hora_final_p})`;
-            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
-                if(err) {
-                    console.error('SQL error: ', err);
-                    return next(err);
-                }
-                var response = result[0];
-                res.json(response[0]);
-                console.log(result);
-            });
-        }
-    });
-} catch(ex) {
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-/****************** 14. uspAddHorarioZona ******************/
-router.post('/HackLeon/v1/AddHorarioZona', function(req, res, next) {
-  try{
-    var reqObj = req.body;
-    console.log(reqObj);
-    req.getConnection(function(err, conn){
-        if(err) {
-            console.error('SQL Connection error: ', err);
-            return next(err);
-        }else{
-            var id_servidor_p = req.body.IdServidorPublico_P;
-            var id_detalle_zona_p = req.body.IdDetalle_Zona_Horario_P;
-            var codigo_p = req.body.Codigo_P;
-
-            var auxQuery = `CALL uspAddHorarioZona(${id_servidor_p}, 
-            ${id_detalle_zona_p}, '${codigo_p}')`;
-            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
-                if(err) {
-                    console.error('SQL error: ', err);
-                    return next(err);
-                }
-                var response = result[0];
-                res.json(response[0]);
-                console.log(result);
-            });
-        }
-    });
-} catch(ex) {
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-/****************** 16. uspGetAllReporte ******************/
-router.post('/HackLeon/v1/GetAllReporte', function(req, res, next) {
-  try{
-    var reqObj = req.body;
-    console.log(reqObj);
-    req.getConnection(function(err, conn){
-        if(err) {
-            console.error('SQL Connection error: ', err);
-            return next(err);
-        }else{
-            var id_servidor_p = req.body.IdServidorPublico_P;
-            var id_detalle_zona_p = req.body.IdDetalle_Zona_Horario_P;
-            var codigo_p = req.body.Codigo_P;
-
-            var auxQuery = `CALL uspGetAllReporte(${id_servidor_p}, 
-            ${id_detalle_zona_p}, '${codigo_p}')`;
-            var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
-                if(err) {
-                    console.error('SQL error: ', err);
-                    return next(err);
-                }
-                var response = result[0];
-                res.json(response[0]);
-                console.log(result);
-            });
-        }
-    });
-} catch(ex) {
-    console.error("Internal error:" + ex);
-    return next(ex);
-  }
-});
-
-
-/****************** 18. u ******************/
-router.post('/HackLeon/v1/AddHorarioZona', function(req, res, next) {
-  try{
-    var reqObj = req.body;
-    console.log(reqObj);
-    req.getConnection(function(err, conn){
-        if(err) {
-            console.error('SQL Connection error: ', err);
-            return next(err);
-        }else{
-            var id_servidor_p = req.body.IdServidorPublico_P;
-            var id_detalle_zona_p = req.body.IdDetalle_Zona_Horario_P;
-            var codigo_p = req.body.Codigo_P;
-
-            var auxQuery = `CALL uspAddHorarioZona(${id_servidor_p}, 
-            ${id_detalle_zona_p}, '${codigo_p}')`;
             var query = conn.query(auxQuery, Object.values(reqObj), function(err, result) {
                 if(err) {
                     console.error('SQL error: ', err);
