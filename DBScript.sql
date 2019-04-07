@@ -2,7 +2,7 @@ CREATE DATABASE DBHackLeon;
 
 USE DBHackLeon;
 
-/*****************Tablas************************/
+/***************** Tablas ************************/
 
 CREATE TABLE CategoriaReporteSOS
 (
@@ -28,13 +28,6 @@ CREATE TABLE CategoriaReporte
     Denominacion NVARCHAR(30) NOT NULL
 );
 
-CREATE TABLE HorarioZona
-(
-	IdHorarioZona INT AUTO_INCREMENT PRIMARY KEY,
-    HoraInicial TINYINT NOT NULL,
-    HoraFinal TINYINT NOT NULL
-);
-
 CREATE TABLE Ciudadano
 (
 	IdCiudadano BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -44,6 +37,21 @@ CREATE TABLE Ciudadano
     CURP NVARCHAR(18) UNIQUE NOT NULL
 );
 
+CREATE TABLE Analista911
+(
+	IdAnalista911 INT AUTO_INCREMENT PRIMARY KEY,
+    Username NVARCHAR(30) NOT NULL,
+    Contraseña NVARCHAR(30) NOT NULL,
+    RFC NVARCHAR(13) NOT NULL
+);
+
+CREATE TABLE Dependencia
+(
+	IdDependencia INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre NVARCHAR(30) NOT NULL,
+    Ubicacion NVARCHAR(255) NOT NULL
+);
+
 CREATE TABLE ServidorPublico
 (
 	IdServidorPublico INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,6 +59,15 @@ CREATE TABLE ServidorPublico
     Username NVARCHAR(30) UNIQUE NOT NULL,
     Contraseña NVARCHAR(30) NOT NULL,
     RFC NVARCHAR(13) UNIQUE NOT NULL
+);
+
+CREATE TABLE AnalistaC4
+(
+	IdAnalistaC4 INT AUTO_INCREMENT PRIMARY KEY,
+    IdZona INT NOT NULL,
+    Username NVARCHAR(30) NOT NULL,
+    Contraseña NVARCHAR(30) NOT NULL,
+    RFC NVARCHAR(13) NOT NULL
 );
 
 CREATE TABLE Reporte
@@ -64,7 +81,17 @@ CREATE TABLE Reporte
     FechaRegistro DATETIME NOT NULL,
     UbicacionRegistro TEXT NOT NULL,
     FechaHecho DATETIME NOT NULL,
-    UbicacionHecho TEXT NOT NULL
+    UbicacionHecho TEXT NOT NULL,
+    Estado TINYINT DEFAULT 1,
+    Seguimiento NVARCHAR(100) DEFAULT 'Reporte Registrado'
+);
+
+CREATE TABLE Canalizacion_Reporte
+(
+	IdReporte BIGINT DEFAULT 1 PRIMARY KEY,
+    IdServidorPublico INT NOT NULL,
+    IdAnalistaC4 INT NOT NULL,
+    Fecha DATETIME NOT NULL
 );
 
 CREATE TABLE ReporteSOS
@@ -72,59 +99,46 @@ CREATE TABLE ReporteSOS
 	IdReporteSOS BIGINT AUTO_INCREMENT PRIMARY KEY,
     IdCiudadano BIGINT NOT NULL,
     IdCategoriaReporteSOS TINYINT NOT NULL,
-    IdServidorPublico INT DEFAULT 0,
     Ubicacion NVARCHAR(255) NOT NULL,
     Fecha DATETIME NOT NULL,
     Video NVARCHAR(255) NULL,
     Foto NVARCHAR(255) NULL,
     Audio NVARCHAR(255) NOT NULL,
-    IsCerrada BOOLEAN DEFAULT FALSE
+    IsCerrado BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE Detalle_Zona_Horario
+CREATE TABLE Canalizacion_Reporte_SOS
 (
-	IdDetalleZona_Horario INT AUTO_INCREMENT PRIMARY KEY,
-    IdHorarioZona TINYINT NOT NULL,
-    IdZona INT NOT NULL,
-    Codigo CHAR(1) NOT NULL
+	IdReporteSOS BIGINT PRIMARY KEY NOT NULL,
+    IdDependencia INT NULL,
+    IdAnalista911 INT NULL,
+    Fecha DATETIME NULL
 );
 
-CREATE TABLE Detalle_Ciudadano_Zona
-(
-	IdCiudadano_Zona BIGINT AUTO_INCREMENT PRIMARY KEY,
-    IdZona INT NOT NULL,
-    IdCiudadano BIGINT NOT NULL
-);
 
-CREATE TABLE Detalle_Ciudadano_Reporte
-(
-	IdDetalleCiudadano_Reporte BIGINT AUTO_INCREMENT PRIMARY KEY,
-    IdCiudadano BIGINT NOT NULL,
-    IdReporte BIGINT NOT NULL,
-    IsActivo BOOLEAN DEFAULT TRUE
-);
-
-/*************Relaciones**********************/
+/************* Relaciones **********************/
 
 ALTER TABLE ServidorPublico ADD CONSTRAINT FK_Rol_ServidorPublico FOREIGN KEY(IdRol) REFERENCES Rol(IdRol);
+
+ALTER TABLE AnalistaC4 ADD CONSTRAINT FK_Zona_ServidorPublico FOREIGN KEY(IdZona) REFERENCES Zona(IdZona);
 
 ALTER TABLE Reporte ADD CONSTRAINT FK_Ciudadano_Reporte FOREIGN KEY(IdCiudadano) REFERENCES Ciudadano(IdCiudadano);
 
 ALTER TABLE Reporte ADD CONSTRAINT FK_CategoriaReporte_Reporte FOREIGN KEY(IdCategoriaReporte) REFERENCES CategoriaReporte(IdCategoriaReporte);
 
-ALTER TABLE ReporteSOS ADD CONSTRAINT FK_Persona_ReporteSOS FOREIGN KEY(IdCiudadano) REFERENCES Ciudadano(IdCiudadano);
+ALTER TABLE Canalizacion_Reporte ADD CONSTRAINT FK_ServidorPublico_Canalizacion_Reporte FOREIGN KEY(IdServidorPublico) REFERENCES ServidorPublico(IdServidorPublico);
+
+ALTER TABLE Canalizacion_Reporte ADD CONSTRAINT FK_Reporte_Canalizacion_Reporte FOREIGN KEY(IdReporte) REFERENCES Reporte(IdReporte);
+
+ALTER TABLE ReporteSOS ADD CONSTRAINT FK_Ciudadano_ReporteSOS FOREIGN KEY(IdCiudadano) REFERENCES Ciudadano(IdCiudadano);
 
 ALTER TABLE ReporteSOS ADD CONSTRAINT FK_CategoriaReporteSOS_ReporteSOS FOREIGN KEY(IdCategoriaReporteSOS) REFERENCES CategoriaReporteSOS(IdCategoriaReporteSOS);
 
-ALTER TABLE ReporteSOS ADD CONSTRAINT FK_ServidorPublico_ReporteSOS FOREIGN KEY(IdServidorPublico) REFERENCES ServidorPublico(IdServidorPublico);
+ALTER TABLE CanalizacionReporteSOS ADD CONSTRAINT FK_ReporteSOS_Canalizacion_Reporte_SOS FOREIGN KEY(IdReporteSOS) REFERENCES ReporteSOS(IdReporteSOS);
 
-ALTER TABLE Detalle_Zona_Horario ADD CONSTRAINT FK_HorarioZona_Detalle_Zona_Horario FOREIGN KEY(IdHorarioZona) REFERENCES HorarioZona(IdHorarioZona);
+ALTER TABLE Canalizacion_Reporte_SOS ADD CONSTRAINT FK_Dependencia_Canalizacion_Reporte_SOS FOREIGN KEY(IdDependencia) REFERENCES Dependencia(IdDependencia);
 
-ALTER TABLE Detalle_Zona_Horario ADD CONSTRAINT FK_Zona_Detalle_Zona_Horario FOREIGN KEY(IdZona) REFERENCES Zona(IdZona);
-
-ALTER TABLE Detalle_Ciudadano_Reporte ADD CONSTRAINT FK_Ciudadano_Detalle_Ciudadano_Reporte FOREIGN KEY(IdCiudadano) REFERENCES Ciudadano(IdCiudadano);
-
-ALTER TABLE Detalle_Ciudadano_Reporte ADD CONSTRAINT FK_Reporte_Detalle_Ciudadano_Reporte FOREIGN KEY(IdReporte) REFERENCES Reporte(IdReporte);
+ALTER TABLE Canalizacion_Reporte_SOS ADD CONSTRAINT FK_Analista_Canalizacion_Reporte_SOS FOREIGN KEY(IdAnalista911) REFERENCES Analista911(IdAnalista911);
 
 /************Procedimientos Almacenados********************/
 
@@ -146,7 +160,6 @@ BEGIN
 END;
 $$
 
-###### 2 
 DELIMITER $$
 CREATE PROCEDURE uspLogInServidoPublico
 (
@@ -164,7 +177,7 @@ BEGIN
     SELECT @idServidorPublico;
 END;
 $$
-##### 3
+
 DELIMITER $$
 CREATE PROCEDURE uspAddCiudadano
 (
@@ -202,7 +215,6 @@ BEGIN
 END;
 $$
 
-#### 4.
 DELIMITER $$
 CREATE PROCEDURE uspAddServidorPublico
 (
@@ -240,7 +252,6 @@ BEGIN
 END;
 $$
 
-####### 5.
 DELIMITER $$
 CREATE PROCEDURE uspAddReporte
 (
@@ -291,9 +302,69 @@ BEGIN
 END;
 $$
 
+DELIMITER $$
+CREATE PROCEDURE uspUpdateReporteState
+(
+	IdReporte_P BIGINT,
+    Estado_P TINYINT,
+    Seguimiento_P NVARCHAR(100)
+)
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SHOW ERRORS;
+        ROLLBACK;
+    END;
+    
+    START TRANSACTION;
+    
+    UPDATE Reporte
+		SET
+			Estado = Estado_P,
+            Seguimiento = Seguimiento_P
+		WHERE 
+			IdReporte_P = IdReporte;
+	SELECT TRUE;
+    COMMIT;
+END;
+$$
 
+DELIMITER $$
+CREATE PROCEDURE uspLink_Reporte_Funcionario
+(
+	IdReporte_P BIGINT,
+    IdServidorPublico_P INT,
+    IdAnalistaC4_P INT
+)
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SHOW ERRORS;
+        ROLLBACK;
+    END;
+    
+    START TRANSACTION;
+    
+    INSERT INTO Canalizacion_Reporte
+    (
+		IdReporte,
+        IdServidorPublico,
+        IdAnalistaC4,
+        Fecha
+    )
+    VALUES
+    (
+		IdReporte_P,
+        IdServidorPublico_P,
+        IdAnalista_P,
+        NOW()
+    );
+    
+    SELECT TRUE;
+    COMMIT;
+END;
+$$
 
-####### 6.
 DELIMITER $$
 CREATE PROCEDURE uspGiveApoyo
 (
@@ -331,7 +402,6 @@ BEGIN
 END;
 $$
 
-####### 7
 DELIMITER $$
 CREATE PROCEDURE uspRemoveApoyo
 (
@@ -366,7 +436,6 @@ BEGIN
 END;
 $$
 
-######## 8
 DELIMITER $$
 CREATE PROCEDURE uspAddReporteSOS_Video
 (
@@ -399,7 +468,19 @@ BEGIN
         IdCategoriaReporteSOS_P,
         IdServidorPublico_P,
         Ubicacion_P,
+        NOW(),
         Video_P
+    );
+    
+    SET @idReporteSOS = (SELECT LAST_INSERT_Id());
+    
+    INSERT INTO Canalizacion_Reporte_SOS
+    (
+		IdReporteSOS
+    )
+    VALUES
+    (
+		@idReporteSOS
     );
     
     SELECT TRUE;
@@ -407,7 +488,6 @@ BEGIN
 END;
 $$
 
-###### 9
 DELIMITER $$
 CREATE PROCEDURE uspAddReporteSOS_Imagen
 (
@@ -443,13 +523,23 @@ BEGIN
         Imagen_P
     );
     
+    SET @idReporteSOS = (SELECT LAST_INSERT_Id());
+    
+    INSERT INTO Canalizacion_Reporte_SOS
+    (
+		IdReporteSOS
+    )
+    VALUES
+    (
+		@idReporteSOS
+    );
+    
     SELECT TRUE;
     COMMIT;
 END;
 $$
 
 
-####### 10
 DELIMITER $$
 CREATE PROCEDURE uspAddReporteSOS_Audio
 (
@@ -485,12 +575,50 @@ BEGIN
         Audio_P
     );
     
+    SET @idReporteSOS = (SELECT LAST_INSERT_Id());
+    
+    INSERT INTO Canalizacion_Reporte_SOS
+    (
+		IdReporteSOS
+    )
+    VALUES
+    (
+		@idReporteSOS
+    );
+    
     SELECT TRUE;
     COMMIT;
 END;
 $$
 
-###### 11
+DELIMITER $$
+CREATE PROCEDURE uspLink_ReporteSOS_Dependencia
+(
+	IdReporteSOS_P BIGINT,
+	IdDependencia_P INT,
+    IdAnalista911_P INT
+)
+BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SHOW ERRORS;
+        ROLLBACK;
+    END;
+    
+    START TRANSACTION;
+    
+    UPDATE Canalizacion_Reporte_SOS
+		SET
+			IdDependencia = IdDependencia_P,
+            IdAnalista911 = IdAnalista911_P,
+            Fecha = NOW()
+		WHERE
+			IdReporteSOS_P = IdReporteSOS;
+    SELECT TRUE;
+    COMMIT;
+END;
+$$
+
 DELIMITER $$
 CREATE PROCEDURE uspFinishReporteSOS
 (
@@ -524,156 +652,8 @@ BEGIN
 END;
 $$
 
-########## 12
-DELIMITER $$
-CREATE PROCEDURE uspAddHorarioZona
-(
-	IdServidorPublico_P INT,
-    HoraInicial_P TINYINT,
-    HoraFinal_P TINYINT
-)
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        SHOW ERRORS;
-        ROLLBACK;
-    END;
-    
-    START TRANSACTION;
-    
-    SET @idRol = (SELECT IdRol FROM ServidorPublico WHERE IdServidorPublico = IdServidorPublico_P);
-    
-    IF (SELECT @idRol = 3)
-		THEN
-            INSERT INTO HorarioZona
-            (
-				HoraInicial,
-                HoraFinal
-            )
-            VALUES
-            (
-				HoraInicial_P,
-                HoraFinal_P
-            );
-			SELECT TRUE;
-            COMMIT;
-		ELSE
-			SELECT FALSE;
-	END IF;
-END;
-$$
-
-###### 13
-DELIMITER $$
-CREATE PROCEDURE uspAddDetalle_Zona_Horario
-(
-	IdServidorPublico_P INT,
-	IdHorarioZona_P TINYINT,
-    IdZona_P INT,
-    Codigo_P CHAR(1)
-)
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        SHOW ERRORS;
-        ROLLBACK;
-    END;
-    
-    START TRANSACTION;
-    
-    SET @idRol = (SELECT IdRol FROM ServidorPublico WHERE IdServidorPublico = IdServidorPublico_P);
-    
-    IF (SELECT @idRol = 3)
-		THEN
-            INSERT INTO Detalle_Zona_Horario
-            (
-				IdHorarioZona,
-                IdZona,
-                Codigo
-            )
-            VALUES
-            (
-				IdHorarioZona_P,
-                IdZona_P,
-                Codigo_P
-            );
-			SELECT TRUE;
-            COMMIT;
-		ELSE
-			SELECT FALSE;
-	END IF;
-END;
-$$
-
-
-##### 14
-DELIMITER $$
-CREATE PROCEDURE uspUpdateDetalle_Zona_Horario
-(
-	IdServidorPublico_P INT,
-    IdDetalle_Zona_Horario_P INT,
-    Codigo_P CHAR(1)
-)
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        SHOW ERRORS;
-        ROLLBACK;
-    END;
-    
-    START TRANSACTION;
-    
-    SET @idRol = (SELECT IdRol FROM ServidorPublico WHERE IdServidorPublico = IdServidorPublico_P);
-    
-    IF (SELECT @idRol = 3)
-		THEN
-            UPDATE Detalle_Zona_Horario
-				SET 
-					Codigo = Codigo_P
-                WHERE 
-					IdDetalle_Zona_Horario = IdDetalle_Zona_Horario_P;
-			SELECT TRUE;
-            COMMIT;
-		ELSE
-			SELECT FALSE;
-	END IF;
-END;
-$$
-
-##### 15
-DELIMITER $$
-CREATE PROCEDURE uspAddDetalle_Ciudadano_Zona
-(
-	IdCiudadano BIGINT,
-    IdZona INT
-)
-BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        SHOW ERRORS;
-        ROLLBACK;
-    END;
-    
-    START TRANSACTION;
-    
-    INSERT INTO Detalle_Ciudadano_Zona
-    (
-		IdCiudadano,
-        IdZona
-    )
-    VALUES
-    (
-		IdCiudadano_P,
-        IdZona_P
-    );
-    
-    SELECT TRUE;
-    COMMIT;
-END;
-$$
-
 /****************Consultas*************************/
-#### 16
+
 DELIMITER $$
 CREATE PROCEDURE uspGetAllReporte()
 BEGIN
